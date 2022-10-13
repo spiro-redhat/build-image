@@ -1,0 +1,18 @@
+apiVersion: tekton.dev/v1beta1 
+kind: Task
+metadata:
+  name: create-dockerfile
+spec:
+  workspaces:
+    - name: output
+  steps:
+    - name: create-dockerfile
+      image: registry.access.redhat.com/ubi8-minimal:8.6
+      command: 
+        - bin/sh 
+        - '-c'
+      args: 
+        - |-
+          echo "FROM  quay.io/spiro-redhat/eap74-openjdk8-runtime-openshift-rhel7:latest" > $(workspaces.output.path)/Dockerfile
+          echo "COPY . /usr/share/fonts/truetype" >> $(workspaces.output.path)/Dockerfile
+      

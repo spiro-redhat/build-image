@@ -1,0 +1,83 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+ name: eap-ttf-pipeline
+spec:
+  workspaces:
+   - name: pipeline-cache
+   - name: gen-config
+  
+  params:
+   - name: GIT_URL
+     type: string
+     default: https://github.com/spiro-redhat/fonts.git  
+   - name: GIT_REVISION
+     type: string
+     default: main
+   - name: OUTPUT_IMAGE_STREAM
+     type: string
+     default: 'eap74-ttf'
+   - name: NAMESPACE
+     type: string
+     default: poc
+  tasks:
+    - name: git-clone
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: pipeline-cache
+      params:
+        - name: url
+          value: $(params.GIT_URL) 
+        - name: revision
+          value: $(params.GIT_REVISION)  
+        - name: sslVerify
+          value: "false"
+    - name: create-dockerfile
+      taskRef:
+        kind: Task
+        name: create-dockerfile
+      runAfter:
+        - "git-clone"
+      workspaces:
+        - name: output
+          workspace: pipeline-cache
+      
+   # build task 
+   # docker://image-registry.openshift-image-registry.svc:5000/test/eap75-ttf
+    - name: buildah-image
+      taskRef:
+        name: buildah
+        kind: ClusterTask   
+      runAfter:
+        - create-dockerfile
+      params:
+        #- name: SKIP_PUSH
+        #  value: 'true' 
+        - name: IMAGE
+          value: 'image-registry.openshift-image-registry.svc:5000/test/eap75-ttf'
+        - name: TLSVERIFY
+          value: 'false'
+      workspaces:
+        - name: source
+          workspace: pipeline-cache       
+    
+
+
+   # - name: build-eap-image
+   #   taskRef:
+   #     name: build-eap-image
+   #   params:
+   ##     - name: IMAGE_STREAM
+   #       value: $(params.OUTPUT_IMAGE_STREAM)
+   #       value: $(params.NAMESPACE)
+   ##     - name: NAMESPACE
+   #   runAfter: 
+   #     - git-clone  
+   #   workspaces:
+   #     - name: output
+   #       workspace: pipeline-cache
+   #     - name: gen-config
+ 

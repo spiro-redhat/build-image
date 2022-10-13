@@ -1,0 +1,28 @@
+# https://redhat-scholars.github.io/tekton-tutorial/tekton-tutorial/workspaces.html
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: eap-ttf-plr- 
+  labels:
+    app: poc
+spec:
+  
+  pipelineRef:
+    name: eap-ttf-pipeline
+  workspaces:
+    - name: pipeline-cache # this workspace name must be declared in the Pipeline
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 10Gi
+    - name: gen-config
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
