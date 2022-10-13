@@ -1,12 +1,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
- name: eap-ttf-pipeline
+ name: image-build-pipeline
 spec:
   workspaces:
-   - name: pipeline-cache
-   - name: gen-config
-  
+   - name: source-cache
   params:
    - name: GIT_URL
      type: string
@@ -14,12 +12,12 @@ spec:
    - name: GIT_REVISION
      type: string
      default: main
-   - name: OUTPUT_IMAGE_STREAM
+   - name: IMAGE_NAME
      type: string
      default: 'eap74-ttf'
    - name: NAMESPACE
      type: string
-     default: poc
+     default: test
   tasks:
     - name: git-clone
       taskRef:
@@ -27,7 +25,7 @@ spec:
         name: git-clone
       workspaces:
         - name: output
-          workspace: pipeline-cache
+          workspace: source-cache
       params:
         - name: url
           value: $(params.GIT_URL) 
@@ -43,10 +41,7 @@ spec:
         - "git-clone"
       workspaces:
         - name: output
-          workspace: pipeline-cache
-      
-   # build task 
-   # docker://image-registry.openshift-image-registry.svc:5000/test/eap75-ttf
+          workspace: source-cache
     - name: buildah-image
       taskRef:
         name: buildah
@@ -54,30 +49,13 @@ spec:
       runAfter:
         - create-dockerfile
       params:
-        #- name: SKIP_PUSH
+        #- name: SKIP_PUSH # if you want to skip the push 
         #  value: 'true' 
         - name: IMAGE
-          value: 'image-registry.openshift-image-registry.svc:5000/test/eap75-ttf'
+          value: 'image-registry.openshift-image-registry.svc:5000/$(params.NAMESPACE)/$(params.IMAGE_NAME):0.1'
         - name: TLSVERIFY
           value: 'false'
       workspaces:
         - name: source
-          workspace: pipeline-cache       
+          workspace: source-cache       
     
-
-
-   # - name: build-eap-image
-   #   taskRef:
-   #     name: build-eap-image
-   #   params:
-   ##     - name: IMAGE_STREAM
-   #       value: $(params.OUTPUT_IMAGE_STREAM)
-   #       value: $(params.NAMESPACE)
-   ##     - name: NAMESPACE
-   #   runAfter: 
-   #     - git-clone  
-   #   workspaces:
-   #     - name: output
-   #       workspace: pipeline-cache
-   #     - name: gen-config
- 

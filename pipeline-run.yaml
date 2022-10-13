@@ -2,27 +2,20 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: eap-ttf-plr- 
+  generateName: i-b-pr- 
   labels:
     app: poc
 spec:
   
   pipelineRef:
-    name: eap-ttf-pipeline
+    name: image-build-pipeline
   workspaces:
-    - name: pipeline-cache # this workspace name must be declared in the Pipeline
+    - name: source-cache 
       volumeClaimTemplate:
         spec:
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 10Gi
-    - name: gen-config
-      volumeClaimTemplate:
-        spec:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 1Gi
+              storage: 100Mi
+   
