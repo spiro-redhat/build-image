@@ -13,6 +13,6 @@ spec:
         - '-c'
       args: 
         - |-
-          echo "FROM  quay.io/spiro-redhat/eap74-openjdk8-runtime-openshift-rhel7:latest" > $(workspaces.output.path)/Dockerfile
-          echo "COPY . /usr/share/fonts/truetype" >> $(workspaces.output.path)/Dockerfile
+          echo "FROM  registry.access.redhat.com/ubi8:8.6" > $(workspaces.output.path)/Dockerfile
+          echo "COPY . /usr/share/fonts/truetype/" >> $(workspaces.output.path)/Dockerfile
       

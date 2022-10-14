@@ -52,7 +52,7 @@ spec:
         #- name: SKIP_PUSH # if you want to skip the push 
         #  value: 'true' 
         - name: IMAGE
-          value: 'image-registry.openshift-image-registry.svc:5000/$(params.NAMESPACE)/$(params.IMAGE_NAME):0.1'
+          value: 'image-registry.openshift-image-registry.svc:5000/$(params.NAMESPACE)/$(params.IMAGE_NAME):0.2'
         - name: TLSVERIFY
           value: 'false'
       workspaces:
