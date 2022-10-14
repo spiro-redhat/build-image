@@ -4,7 +4,9 @@ metadata:
  name: image-build-pipeline
 spec:
   workspaces:
-   - name: source-cache
+   - name: source-ws
+   - name: dockerconfig-ws
+     optional: true
   params:
    - name: GIT_URL
      type: string
@@ -17,7 +19,7 @@ spec:
      default: 'eap74-ttf'
    - name: NAMESPACE
      type: string
-     default: test
+     default: $(context.pipelineRun.namespace)
   tasks:
     - name: git-clone
       taskRef:
@@ -25,7 +27,7 @@ spec:
         name: git-clone
       workspaces:
         - name: output
-          workspace: source-cache
+          workspace: source-ws
       params:
         - name: url
           value: $(params.GIT_URL) 
@@ -41,13 +43,18 @@ spec:
         - "git-clone"
       workspaces:
         - name: output
-          workspace: source-cache
+          workspace: source-ws
     - name: buildah-image
       taskRef:
         name: buildah
         kind: ClusterTask   
       runAfter:
         - create-dockerfile
+      workspaces:
+        - name: source
+          workspace: source-ws
+        - name: dockerconfig
+          workspace: dockerconfig-ws
       params:
         #- name: SKIP_PUSH # if you want to skip the push 
         #  value: 'true' 
@@ -55,7 +62,5 @@ spec:
           value: 'image-registry.openshift-image-registry.svc:5000/$(params.NAMESPACE)/$(params.IMAGE_NAME):0.2'
         - name: TLSVERIFY
           value: 'false'
-      workspaces:
-        - name: source
-          workspace: source-cache       
+      
     

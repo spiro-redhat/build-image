@@ -12,7 +12,7 @@ spec:
         deploymentconfig: hello-world
     spec:
       containers:
-      - image: image-registry.openshift-image-registry.svc:5000/test/eap74-ttf:0.1
+      - image: eap74-ttf:0.1
         name: hello-world-container
         command: [ "/bin/sh", "-c",  "while true ; do ls -l /usr/share/fonts/truetype/ ; date ; sleep 10; done;" ]
   triggers:

@@ -10,7 +10,7 @@ spec:
   pipelineRef:
     name: image-build-pipeline
   workspaces:
-    - name: source-cache 
+    - name: source-ws 
       volumeClaimTemplate:
         spec:
           accessModes:
@@ -18,4 +18,6 @@ spec:
           resources:
             requests:
               storage: 100Mi
-   
+    - name: dockerconfig-ws
+      secret:
+        secretName: spiro-redhat-pull-secret
