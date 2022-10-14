@@ -1,0 +1,1 @@
+for i in $(oc get pipelineruns | grep -v NAME | awk '{print $1}') ; do oc delete pipelinerun $i ; done
